@@ -1,0 +1,33 @@
+---
+version: "3"
+
+services:
+  server:
+    image: gitea/gitea:latest
+    container_name: gitea
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+    restart: always
+    networks:
+      - proxy_network
+    volumes:
+      - gitea:/data
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "2222:22"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.gitea.rule=Host(`git.kanto.internal`)
+      - traefik.http.routers.gitea.entrypoints=https
+      - traefik.http.routers.gitea.tls=true
+      - traefik.http.services.gitea.loadbalancer.server.port=3000
+
+networks:
+  proxy_network:
+    external: true
+
+volumes:
+  gitea:
+    name: gitea

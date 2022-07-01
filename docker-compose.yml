@@ -1,6 +1,15 @@
 ---
 version: "3"
 
+volumes:
+  gitea:
+    name: gitea
+
+networks:
+  proxy:
+    name: proxy
+    external: true
+
 services:
   server:
     image: gitea/gitea:latest
@@ -10,7 +19,7 @@ services:
       - USER_GID=1000
     restart: always
     networks:
-      - proxy_network
+      - proxy
     volumes:
       - gitea:/data
       - /etc/timezone:/etc/timezone:ro
@@ -23,11 +32,3 @@ services:
       - traefik.http.routers.gitea.entrypoints=https
       - traefik.http.routers.gitea.tls=true
       - traefik.http.services.gitea.loadbalancer.server.port=3000
-
-networks:
-  proxy_network:
-    external: true
-
-volumes:
-  gitea:
-    name: gitea
